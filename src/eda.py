@@ -5,10 +5,15 @@ import seaborn as sns
 import os
 
 #Path
-CLEANED_DATA_PATH = os.path.join("data", "processed", "cleaned_students.csv")
+#CLEANED_DATA_PATH = os.path.join("data", "processed", "cleaned_students.csv")
+FIGURES_PATH = os.path.join("reports", "figures")
+
+os.makedirs(FIGURES_PATH, exist_ok=True)
+#os.makedirs(CLEANED_DATA_PATH, exist_ok=True)
 
 # Visualization settings
-plt.style.use("seaborn-whitegrid")
+print(plt.style.available)
+#plt.style.use("seaborn-whitegrid")
 sns.set_palette("pastel")
 
 # Load dataset
@@ -37,7 +42,7 @@ print("\nDuplicate rows:", df.duplicated().sum())
 df.rename(columns=lambda x: x.strip().lower().replace(" ", "_"), inplace=True)
 
 # Save cleaned data
-df.to_csv(CLEANED_DATA_PATH, index=False)
+#df.to_csv(CLEANED_DATA_PATH, index=False)
 
 # ---------------------
 # Univariate Analysis
@@ -51,7 +56,7 @@ for col in numerical_cols:
     plt.figure(figsize=(8, 4))
     sns.histplot(df[col], kde=True, bins=20)
     plt.title(f'Distribution of {col}')
-    plt.show()
+    plt.savefig(os.path.join(FIGURES_PATH, f"hist_{col}.png"))
     
 # Categorical features - bar plots
 categorical_cols = df.select_dtypes(include=['object']).columns
@@ -60,7 +65,7 @@ for col in categorical_cols:
     sns.countplot(data=df, x=col)
     plt.title(f'Count plot of {col}')
     plt.xticks(rotation=45)
-    plt.show()
+    plt.savefig(os.path.join(FIGURES_PATH, f"bar_{col}.png"))
 
 # -----------------------------
 # Bivariate Analysis
@@ -72,13 +77,14 @@ for i,col1 in enumerate(numerical_cols):
         plt.figure(figsize=(6, 4))
         sns.scatterplot(data=df, x=col1, y=col2)
         plt.title(f'{col1} vs {col2}')
-        plt.show()
+        plt.savefig(os.path.join(FIGURES_PATH, "scatter_{col1}_{col2}.png"))
+
         
 # Correlation heatmap
 plt.figure(figsize=(6, 4))
 sns.heatmap(df[numerical_cols].corr(), annot=True, cmap='coolwarm')
 plt.title('Correlation Heatmap')
-plt.show()
+plt.savefig(os.path.join(FIGURES_PATH, "heatmap_scores.png"))
 
 # Categorical vs Numerical - boxplots
 for cat_col in categorical_cols:
@@ -87,7 +93,7 @@ for cat_col in categorical_cols:
         sns.boxplot(data=df, x=cat_col, y=num_col)
         plt.title(f'{num_col} by {cat_col}')
         plt.xticks(rotation=45)
-        plt.show()
+        plt.savefig(os.path.join(FIGURES_PATH, "boxplot_{num_col}_{cat_col}.png"))
 
 # -------------------------------
 # Multivariate Analysis
@@ -96,14 +102,14 @@ print("\n--- Multivariate Analysis ---\n")
 
 sns.pairplot(df, vars=numerical_cols, hue=categorical_cols[0], diag_kind='kde')
 plt.suptitle("Pairwise Relationships with Hue", y=1.02)
-plt.show()
+plt.savefig(os.path.join(FIGURES_PATH, "pairplot_with_hue.png"))
 
 
 #Correlation Heatmap
 plt.figure(figsize=(8, 6))
 sns.heatmap(df[numerical_cols].corr(), annot=True, cmap="coolwarm" , linewidths=0.5)
 plt.title("Correlation Heatmap of Numerical Scores")
-plt.show()
+plt.savefig(os.path.join(FIGURES_PATH, "heatmap_numerical_scores.png"))
 
 #Compares multiple scores across categories
 for cat_col in categorical_cols:
@@ -115,7 +121,7 @@ for cat_col in categorical_cols:
     plt.title(f"Mean Scores by {cat_col}")
     plt.xticks(rotation=45)
     plt.legend(title="Score Type")
-    plt.show()
+    plt.savefig(os.path.join(FIGURES_PATH, "barplot_{cat_col}.png"))
     
     
 
